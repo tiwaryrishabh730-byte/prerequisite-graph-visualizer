@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "id": "algebra",
+      "label": "Basic Algebra",
+      "mastery": 0.8,
+      "position": { "x": 100, "y": 100 }
+    },
+    {
+      "id": "factorization",
+      "label": "Factorization",
+      "mastery": 0.4,
+      "position": { "x": 300, "y": 100 }
+    },
+    {
+      "id": "quadratics",
+      "label": "Quadratic Equations",
+      "mastery": 0.5,
+      "position": { "x": 500, "y": 100 }
+    },
+    {
+      "id": "applications",
+      "label": "Applications",
+      "mastery": 0.0,
+      "position": { "x": 700, "y": 100 }
+    }
+  ],
+  "edges": [
+    { "source": "algebra", "target": "factorization" },
+    { "source": "factorization", "target": "quadratics" },
+    { "source": "quadratics", "target": "applications" }
+  ]
+}
