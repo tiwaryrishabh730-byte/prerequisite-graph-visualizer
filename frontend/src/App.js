@@ -1,16 +1,31 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import StudentDashboard from './pages/StudentDashboard';
-import TeacherDashboard from './pages/TeacherDashboard';
+import React, { useEffect, useState } from 'react';
+import api from './services/api';
 
 function App() {
+  const [graphData, setGraphData] = useState(null);
+
+  useEffect(() => {
+    async function fetchGraph() {
+      try {
+        const response = await api.get('/graph');
+        setGraphData(response.data);
+        console.log('Graph data:', response.data);
+      } catch (error) {
+        console.error('Error fetching graph:', error);
+      }
+    }
+    fetchGraph();
+  }, []);
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<StudentDashboard />} />
-        <Route path="/teacher" element={<TeacherDashboard />} />
-      </Routes>
-    </BrowserRouter>
+    <div>
+      <h1>PreqViz</h1>
+      {graphData ? (
+        <pre>{JSON.stringify(graphData, null, 2)}</pre>
+      ) : (
+        <p>Loading graph...</p>
+      )}
+    </div>
   );
 }
 
