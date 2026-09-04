@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import ReactFlow, {
   addEdge,
   Background,
@@ -7,48 +7,53 @@ import ReactFlow, {
   useEdgesState,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import api from '../services/api';
 
-const initialNodes = [
-  {
-    id: 'algebra',
-    data: { label: 'Basic Algebra' },
-    position: { x: 100, y: 100 },
-    style: { background: '#10B981', color: 'white', padding: '10px', borderRadius: '8px' },
-  },
-  {
-    id: 'factorization',
-    data: { label: 'Factorization' },
-    position: { x: 300, y: 100 },
-    style: { background: '#EF4444', color: 'white', padding: '10px', borderRadius: '8px' },
-  },
-  {
-    id: 'quadratics',
-    data: { label: 'Quadratic Equations' },
-    position: { x: 500, y: 100 },
-    style: { background: '#F59E0B', color: 'white', padding: '10px', borderRadius: '8px' },
-  },
-  {
-    id: 'applications',
-    data: { label: 'Applications' },
-    position: { x: 700, y: 100 },
-    style: { background: '#6B7280', color: 'white', padding: '10px', borderRadius: '8px' },
-  },
-];
+function Graph({ refreshKey, onNodeClick }) {
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-const initialEdges = [
-  { id: 'e1-2', source: 'algebra', target: 'factorization' },
-  { id: 'e2-3', source: 'factorization', target: 'quadratics' },
-  { id: 'e3-4', source: 'quadratics', target: 'applications' },
-];
+  useEffect(() => {
+    async function fetchGraph() {
+      try {
+        const response = await api.get('/graph');
+        const graphData = response.data;
 
-function Graph() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+        // Convert to React Flow nodes with color based on mastery
+        const flowNodes = graphData.nodes.map((node) => {
+          let bgColor;
+          if (node.mastery >= 0.8) bgColor = '#10B981'; // Green
+          else if (node.mastery >= 0.6) bgColor = '#F59E0B'; // Yellow
+          else bgColor = '#EF4444'; // Red
 
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
-  );
+          return {
+            id: node.id,
+            data: { label: `${node.label} (${(node.mastery * 100).toFixed(0)}%)` },
+            position: node.position,
+            style: {
+              background: bgColor,
+              color: 'white',
+              padding: '10px',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+            },
+          };
+        });
+
+        const flowEdges = graphData.edges.map((edge, i) => ({
+          id: `e${i}`,
+          source: edge.source,
+          target: edge.target,
+        }));
+
+        setNodes(flowNodes);
+        setEdges(flowEdges);
+      } catch (error) {
+        console.error('Error fetching graph:', error);
+      }
+    }
+    fetchGraph();
+  }, [refreshKey, setNodes, setEdges]);
 
   return (
     <div style={{ width: '100%', height: '400px' }}>
@@ -57,7 +62,8 @@ function Graph() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
+        onNodeClick={(event, node) => onNodeClick(node.id)}
+        nodesDraggable={false}
         fitView
       >
         <Background />

@@ -1,20 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 
-function Quiz() {
+function Quiz({ topic, onSubmitted }) {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [mastery, setMastery] = useState(null);
 
   const fetchQuestions = async () => {
     try {
-      const response = await api.get('/questions/quadratics');
+      const response = await api.get(`/questions/${topic}`);
       setQuestions(response.data);
       setAnswers(new Array(response.data.length).fill(null));
     } catch (error) {
       console.error('Error fetching questions:', error);
     }
   };
+
+  useEffect(() => {
+    setQuestions([]);
+    setAnswers([]);
+    setMastery(null);
+    fetchQuestions();
+  }, [topic]);
 
   const handleAnswerChange = (questionIndex, answerIndex) => {
     const newAnswers = [...answers];
@@ -26,6 +33,7 @@ function Quiz() {
     try {
       const formattedAnswers = questions.map((q, i) => ({
         question_id: q.id,
+        topic: q.topic,
         selected_answer: answers[i],
         is_correct: answers[i] === q.correct,
       }));
@@ -35,6 +43,7 @@ function Quiz() {
       });
 
       setMastery(response.data.mastery);
+      onSubmitted();
     } catch (error) {
       console.error('Error submitting quiz:', error);
     }
