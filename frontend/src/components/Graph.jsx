@@ -22,13 +22,20 @@ function Graph({ refreshKey, onNodeClick }) {
         // Convert to React Flow nodes with color based on mastery
         const flowNodes = graphData.nodes.map((node) => {
           let bgColor;
-          if (node.mastery >= 0.8) bgColor = '#10B981'; // Green
-          else if (node.mastery >= 0.6) bgColor = '#F59E0B'; // Yellow
-          else bgColor = '#EF4444'; // Red
+          let label;
+          if (node.mastery === null) {
+            bgColor = '#9CA3AF';
+            label = `${node.label} (Not assessed)`;
+          } else {
+            if (node.mastery >= 0.8) bgColor = '#10B981'; // Green
+            else if (node.mastery >= 0.6) bgColor = '#F59E0B'; // Yellow
+            else bgColor = '#EF4444'; // Red
+            label = `${node.label} (${(node.mastery * 100).toFixed(0)}%)`;
+          }
 
           return {
             id: node.id,
-            data: { label: `${node.label} (${(node.mastery * 100).toFixed(0)}%)` },
+            data: { label },
             position: node.position,
             style: {
               background: bgColor,

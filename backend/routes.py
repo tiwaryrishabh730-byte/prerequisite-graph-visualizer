@@ -20,10 +20,10 @@ GRAPH_DATA = {
 }
 
 STUDENT_MASTERY = {
-    "algebra": 0.8,
-    "factorization": 0.4,
-    "quadratics": 0.5,
-    "applications": 0.0
+    "algebra": None,
+    "factorization": None,
+    "quadratics": None,
+    "applications": None
 }
 
 QUESTION_BANK = {
@@ -84,6 +84,12 @@ async def submit_quiz(submission: QuizSubmission):
         STUDENT_MASTERY[topic] = result["correct"] / result["total"]
 
     return {"mastery": STUDENT_MASTERY}
+
+@router.post("/api/reset")
+async def reset_mastery():
+    for topic in STUDENT_MASTERY:
+        STUDENT_MASTERY[topic] = None
+    return {"status": "reset"}
 
 @router.get("/api/student/{student_id}/mastery")
 async def get_student_mastery(student_id: str):
