@@ -41,14 +41,14 @@ function Heatmap() {
       )}
       {!loading && !error && (
         <>
-          <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+          <table className="w-full max-w-full table-fixed border-separate border-spacing-0">
             <thead>
               <tr>
-                <th style={{ borderBottom: '1px solid #ccc', padding: '8px', textAlign: 'left' }}>Student</th>
-                <th style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>Algebra</th>
-                <th style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>Factorization</th>
-                <th style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>Quadratics</th>
-                <th style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>Applications</th>
+                <th className="text-center" style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>Student</th>
+                <th className="text-center" style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>Algebra</th>
+                <th className="text-center" style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>Factorization</th>
+                <th className="text-center" style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>Quadratics</th>
+                <th className="text-center" style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>Applications</th>
               </tr>
             </thead>
             <tbody>
@@ -58,6 +58,7 @@ function Heatmap() {
                     {row.student}
                   </td>
                   <td
+                    className="border-2 border-white text-center"
                     style={{
                       padding: '8px',
                       background: getCellColor(row.algebra),
@@ -67,6 +68,7 @@ function Heatmap() {
                     {row.algebra === null ? '—' : `${(row.algebra * 100).toFixed(0)}%`}
                   </td>
                   <td
+                    className="border-2 border-white text-center"
                     style={{
                       padding: '8px',
                       background: getCellColor(row.factorization),
@@ -76,6 +78,7 @@ function Heatmap() {
                     {row.factorization === null ? '—' : `${(row.factorization * 100).toFixed(0)}%`}
                   </td>
                   <td
+                    className="border-2 border-white text-center"
                     style={{
                       padding: '8px',
                       background: getCellColor(row.quadratics),
@@ -85,6 +88,7 @@ function Heatmap() {
                     {row.quadratics === null ? '—' : `${(row.quadratics * 100).toFixed(0)}%`}
                   </td>
                   <td
+                    className="border-2 border-white text-center"
                     style={{
                       padding: '8px',
                       background: getCellColor(row.applications),

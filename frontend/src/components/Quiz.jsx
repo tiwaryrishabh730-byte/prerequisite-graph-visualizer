@@ -81,11 +81,17 @@ function Quiz({ topic, studentId, onSubmitted }) {
         </p>
       )}
       {!loading && !error && questions.map((q, i) => (
-        <div key={q.id} className="mb-6">
-          <p className="font-medium text-gray-900 mb-3">{q.question}</p>
+        <div key={q.id} className="mb-8">
+          <p className="text-base font-medium text-gray-900 mb-3">{q.question}</p>
           {q.options.map((opt, j) => (
-            <label key={j} className="flex items-center gap-2 py-1 cursor-pointer">
+            <label
+              key={j}
+              className={`flex w-full items-center gap-2 border rounded-lg px-4 py-3 mb-2 cursor-pointer hover:border-blue-400 transition-colors ${
+                answers[i] === j ? 'border-blue-600 bg-blue-50' : 'border-gray-300'
+              }`}
+            >
               <input
+                className="h-4 w-4 shrink-0"
                 type="radio"
                 name={`question-${i}`}
                 onChange={() => handleAnswerChange(i, j)}

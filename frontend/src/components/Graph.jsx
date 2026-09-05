@@ -9,7 +9,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import api from '../services/api';
 
-function Graph({ refreshKey, studentId, onNodeClick }) {
+function Graph({ refreshKey, studentId, onNodeClick, onGraphData }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [loading, setLoading] = useState(true);
@@ -24,6 +24,7 @@ function Graph({ refreshKey, studentId, onNodeClick }) {
           params: { student_id: studentId },
         });
         const graphData = response.data;
+        onGraphData(graphData.nodes);
 
         // Convert to React Flow nodes with color based on mastery
         const flowNodes = graphData.nodes.map((node) => {

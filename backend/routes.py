@@ -119,6 +119,68 @@ async def get_students():
 async def get_student_mastery(student_id: str):
     return STUDENT_MASTERY[student_id]
 
+@router.get("/api/student/{student_id}/root-cause")
+async def get_root_cause(student_id: str):
+    student_mastery = STUDENT_MASTERY[student_id]
+    weak_topics = {
+        topic for topic, mastery in student_mastery.items()
+        if mastery is not None and mastery < 0.8
+    }
+    nodes_by_id = {node["id"]: node for node in GRAPH_DATA["nodes"]}
+    prerequisites = {node["id"]: [] for node in GRAPH_DATA["nodes"]}
+    dependents = {node["id"]: [] for node in GRAPH_DATA["nodes"]}
+
+    for edge in GRAPH_DATA["edges"]:
+        prerequisites[edge["target"]].append(edge["source"])
+        dependents[edge["source"]].append(edge["target"])
+
+    def find_root(topic_id, visited=None):
+        visited = visited or set()
+        if topic_id in visited:
+            return topic_id
+        visited.add(topic_id)
+        weak_prerequisites = [
+            prerequisite for prerequisite in prerequisites[topic_id]
+            if prerequisite in weak_topics
+        ]
+        if not weak_prerequisites:
+            return topic_id
+        return find_root(weak_prerequisites[0], visited)
+
+    root_candidates = {
+        find_root(topic_id) for topic_id in weak_topics
+    }
+    root_id = next(
+        (node["id"] for node in GRAPH_DATA["nodes"] if node["id"] in root_candidates),
+        None,
+    )
+
+    if root_id is None:
+        return {"root_cause": None, "blocked_topics": []}
+
+    blocked_ids = set()
+    pending = list(dependents[root_id])
+    while pending:
+        topic_id = pending.pop(0)
+        if topic_id in blocked_ids:
+            continue
+        blocked_ids.add(topic_id)
+        pending.extend(dependents[topic_id])
+
+    root_node = nodes_by_id[root_id]
+    return {
+        "root_cause": {
+            "id": root_id,
+            "label": root_node["label"],
+            "mastery": student_mastery[root_id],
+        },
+        "blocked_topics": [
+            {"id": node["id"], "label": node["label"]}
+            for node in GRAPH_DATA["nodes"]
+            if node["id"] in blocked_ids and node["id"] in weak_topics
+        ],
+    }
+
 @router.get("/api/teacher/class/{class_id}/heatmap")
 async def get_class_heatmap(class_id: str):
     student_names = {"rohit": "Rohit", "priya": "Priya", "ankit": "Ankit"}

@@ -1,22 +1,51 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
-function NavBar() {
+function Sidebar() {
+  const location = useLocation();
+
   return (
-    <nav className="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
-      <Link to="/" className="font-bold text-gray-900">
+    <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r">
+      <div className="text-xl font-bold text-gray-900 p-6 flex items-center gap-2">
+        <svg
+          className="w-6 h-6 text-blue-600"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          aria-hidden="true"
+        >
+          <path d="M6 12l6-6 6 6-6 6-6-6z" />
+          <circle cx="6" cy="12" r="2" fill="currentColor" />
+          <circle cx="12" cy="6" r="2" fill="currentColor" />
+          <circle cx="18" cy="12" r="2" fill="currentColor" />
+        </svg>
         PreqViz
-      </Link>
-      <div className="flex gap-6">
-        <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium">
-          Student
-        </Link>
-        <Link to="/teacher" className="text-gray-700 hover:text-blue-600 font-medium">
-          Teacher
-        </Link>
       </div>
-    </nav>
+      <nav>
+        <Link
+          to="/"
+          className={`block px-6 py-3 ${
+            location.pathname === '/'
+              ? 'bg-blue-50 text-blue-600 font-medium'
+              : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+          }`}
+        >
+          Student View
+        </Link>
+        <Link
+          to="/teacher"
+          className={`block px-6 py-3 ${
+            location.pathname === '/teacher'
+              ? 'bg-blue-50 text-blue-600 font-medium'
+              : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+          }`}
+        >
+          Teacher View
+        </Link>
+      </nav>
+    </aside>
   );
 }
 
-export default NavBar;
+export default Sidebar;
