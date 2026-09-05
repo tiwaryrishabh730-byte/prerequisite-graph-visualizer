@@ -51,14 +51,18 @@ function Quiz({ topic, onSubmitted }) {
 
   return (
     <div>
-      <h2>Diagnostic Quiz</h2>
-      <button onClick={fetchQuestions}>Start Quiz</button>
+      <button
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium mb-6"
+        onClick={fetchQuestions}
+      >
+        Start Quiz
+      </button>
 
       {questions.map((q, i) => (
-        <div key={q.id} style={{ marginBottom: '20px' }}>
-          <p>{q.question}</p>
+        <div key={q.id} className="mb-6">
+          <p className="font-medium text-gray-900 mb-3">{q.question}</p>
           {q.options.map((opt, j) => (
-            <label key={j} style={{ display: 'block' }}>
+            <label key={j} className="flex items-center gap-2 py-1 cursor-pointer">
               <input
                 type="radio"
                 name={`question-${i}`}
@@ -72,7 +76,12 @@ function Quiz({ topic, onSubmitted }) {
       ))}
 
       {answers.length > 0 && (
-        <button onClick={submitQuiz}>Submit</button>
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium"
+          onClick={submitQuiz}
+        >
+          Submit
+        </button>
       )}
 
       {mastery && (
