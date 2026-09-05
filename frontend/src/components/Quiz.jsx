@@ -5,14 +5,23 @@ function Quiz({ topic, studentId, onSubmitted }) {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [mastery, setMastery] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
   const fetchQuestions = async () => {
+    setLoading(true);
+    setError(false);
     try {
       const response = await api.get(`/questions/${topic}`);
       setQuestions(response.data);
       setAnswers(new Array(response.data.length).fill(null));
     } catch (error) {
       console.error('Error fetching questions:', error);
+      setError(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -20,6 +29,7 @@ function Quiz({ topic, studentId, onSubmitted }) {
     setQuestions([]);
     setAnswers([]);
     setMastery(null);
+    setSubmitError(false);
     fetchQuestions();
   }, [topic, studentId]);
 
@@ -30,6 +40,8 @@ function Quiz({ topic, studentId, onSubmitted }) {
   };
 
   const submitQuiz = async () => {
+    setSubmitting(true);
+    setSubmitError(false);
     try {
       const formattedAnswers = questions.map((q, i) => ({
         question_id: q.id,
@@ -47,6 +59,9 @@ function Quiz({ topic, studentId, onSubmitted }) {
       onSubmitted();
     } catch (error) {
       console.error('Error submitting quiz:', error);
+      setSubmitError(true);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -59,7 +74,13 @@ function Quiz({ topic, studentId, onSubmitted }) {
         Start Quiz
       </button>
 
-      {questions.map((q, i) => (
+      {loading && <p className="text-gray-500 text-sm">Loading questions...</p>}
+      {error && (
+        <p className="text-red-600 text-sm">
+          Couldn't load the questions. Check the backend is running.
+        </p>
+      )}
+      {!loading && !error && questions.map((q, i) => (
         <div key={q.id} className="mb-6">
           <p className="font-medium text-gray-900 mb-3">{q.question}</p>
           {q.options.map((opt, j) => (
@@ -80,9 +101,14 @@ function Quiz({ topic, studentId, onSubmitted }) {
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium"
           onClick={submitQuiz}
+          disabled={submitting}
         >
-          Submit
+          {submitting ? 'Submitting...' : 'Submit'}
         </button>
+      )}
+
+      {submitError && (
+        <p className="text-red-600 text-sm">Couldn't submit your answers. Try again.</p>
       )}
 
       {mastery && (

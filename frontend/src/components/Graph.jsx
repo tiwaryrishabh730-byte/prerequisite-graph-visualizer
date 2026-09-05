@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactFlow, {
   Background,
   Controls,
+  MarkerType,
   useNodesState,
   useEdgesState,
 } from 'reactflow';
@@ -11,9 +12,13 @@ import api from '../services/api';
 function Graph({ refreshKey, studentId, onNodeClick }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function fetchGraph() {
+      setLoading(true);
+      setError(false);
       try {
         const response = await api.get('/graph', {
           params: { student_id: studentId },
@@ -38,6 +43,8 @@ function Graph({ refreshKey, studentId, onNodeClick }) {
             id: node.id,
             data: { label },
             position: node.position,
+            sourcePosition: 'right',
+            targetPosition: 'left',
             style: {
               background: bgColor,
               color: 'white',
@@ -52,16 +59,33 @@ function Graph({ refreshKey, studentId, onNodeClick }) {
           id: `e${i}`,
           source: edge.source,
           target: edge.target,
+          type: 'smoothstep',
+          markerEnd: { type: MarkerType.ArrowClosed },
         }));
 
         setNodes(flowNodes);
         setEdges(flowEdges);
       } catch (error) {
         console.error('Error fetching graph:', error);
+        setError(true);
+      } finally {
+        setLoading(false);
       }
     }
     fetchGraph();
   }, [refreshKey, studentId, setNodes, setEdges]);
+
+  if (loading) {
+    return <p className="text-gray-500 text-sm">Loading your learning map...</p>;
+  }
+
+  if (error) {
+    return (
+      <p className="text-red-600 text-sm">
+        Couldn't load the learning map. Check the backend is running.
+      </p>
+    );
+  }
 
   return (
     <div style={{ width: '100%', height: '400px' }}>
