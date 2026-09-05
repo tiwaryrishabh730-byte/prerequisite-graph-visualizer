@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 
-function Quiz({ topic, onSubmitted }) {
+function Quiz({ topic, studentId, onSubmitted }) {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [mastery, setMastery] = useState(null);
@@ -21,7 +21,7 @@ function Quiz({ topic, onSubmitted }) {
     setAnswers([]);
     setMastery(null);
     fetchQuestions();
-  }, [topic]);
+  }, [topic, studentId]);
 
   const handleAnswerChange = (questionIndex, answerIndex) => {
     const newAnswers = [...answers];
@@ -40,6 +40,7 @@ function Quiz({ topic, onSubmitted }) {
 
       const response = await api.post('/submit-quiz', {
         answers: formattedAnswers,
+        student_id: studentId,
       });
 
       setMastery(response.data.mastery);

@@ -20,10 +20,24 @@ GRAPH_DATA = {
 }
 
 STUDENT_MASTERY = {
-    "algebra": None,
-    "factorization": None,
-    "quadratics": None,
-    "applications": None
+    "rohit": {
+        "algebra": None,
+        "factorization": None,
+        "quadratics": None,
+        "applications": None
+    },
+    "priya": {
+        "algebra": 0.9,
+        "factorization": 0.8,
+        "quadratics": 0.9,
+        "applications": None
+    },
+    "ankit": {
+        "algebra": 0.6,
+        "factorization": 0.3,
+        "quadratics": 0.4,
+        "applications": None
+    }
 }
 
 QUESTION_BANK = {
@@ -55,12 +69,13 @@ QUESTION_BANK = {
 
 class QuizSubmission(BaseModel):
     answers: List[Dict]
+    student_id: str = "rohit"
 
 @router.get("/api/graph")
-async def get_graph():
+async def get_graph(student_id: str = "rohit"):
     return {
         "nodes": [
-            {**node, "mastery": STUDENT_MASTERY[node["id"]]}
+            {**node, "mastery": STUDENT_MASTERY[student_id][node["id"]]}
             for node in GRAPH_DATA["nodes"]
         ],
         "edges": GRAPH_DATA["edges"]
@@ -81,28 +96,33 @@ async def submit_quiz(submission: QuizSubmission):
             result["correct"] += 1
 
     for topic, result in topic_results.items():
-        STUDENT_MASTERY[topic] = result["correct"] / result["total"]
+        STUDENT_MASTERY[submission.student_id][topic] = result["correct"] / result["total"]
 
-    return {"mastery": STUDENT_MASTERY}
+    return {"mastery": STUDENT_MASTERY[submission.student_id]}
 
 @router.post("/api/reset")
 async def reset_mastery():
-    for topic in STUDENT_MASTERY:
-        STUDENT_MASTERY[topic] = None
+    for student_mastery in STUDENT_MASTERY.values():
+        for topic in student_mastery:
+            student_mastery[topic] = None
     return {"status": "reset"}
+
+@router.get("/api/students")
+async def get_students():
+    return [
+        {"id": "rohit", "name": "Rohit"},
+        {"id": "priya", "name": "Priya"},
+        {"id": "ankit", "name": "Ankit"}
+    ]
 
 @router.get("/api/student/{student_id}/mastery")
 async def get_student_mastery(student_id: str):
-    return {
-        "algebra": 0.8,
-        "factorization": 0.4,
-        "quadratics": 0.5
-    }
+    return STUDENT_MASTERY[student_id]
 
 @router.get("/api/teacher/class/{class_id}/heatmap")
 async def get_class_heatmap(class_id: str):
+    student_names = {"rohit": "Rohit", "priya": "Priya", "ankit": "Ankit"}
     return [
-        {"student": "Rohit", "algebra": 0.8, "factorization": 0.4, "quadratics": 0.5},
-        {"student": "Priya", "algebra": 0.9, "factorization": 0.8, "quadratics": 0.9},
-        {"student": "Ankit", "algebra": 0.6, "factorization": 0.3, "quadratics": 0.4}
+        {"student": student_names[student_id], **mastery}
+        for student_id, mastery in STUDENT_MASTERY.items()
     ]

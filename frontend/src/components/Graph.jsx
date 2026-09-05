@@ -1,6 +1,5 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import ReactFlow, {
-  addEdge,
   Background,
   Controls,
   useNodesState,
@@ -9,14 +8,16 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import api from '../services/api';
 
-function Graph({ refreshKey, onNodeClick }) {
+function Graph({ refreshKey, studentId, onNodeClick }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   useEffect(() => {
     async function fetchGraph() {
       try {
-        const response = await api.get('/graph');
+        const response = await api.get('/graph', {
+          params: { student_id: studentId },
+        });
         const graphData = response.data;
 
         // Convert to React Flow nodes with color based on mastery
@@ -60,7 +61,7 @@ function Graph({ refreshKey, onNodeClick }) {
       }
     }
     fetchGraph();
-  }, [refreshKey, setNodes, setEdges]);
+  }, [refreshKey, studentId, setNodes, setEdges]);
 
   return (
     <div style={{ width: '100%', height: '400px' }}>

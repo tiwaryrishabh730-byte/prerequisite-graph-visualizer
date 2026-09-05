@@ -17,6 +17,7 @@ function Heatmap() {
   }, []);
 
   const getCellColor = (score) => {
+    if (score === null) return '#9CA3AF';
     if (score >= 0.8) return '#10B981'; // Green
     if (score >= 0.6) return '#F59E0B'; // Yellow
     return '#EF4444'; // Red
@@ -32,6 +33,7 @@ function Heatmap() {
             <th style={{ border: '1px solid #ccc', padding: '8px' }}>Algebra</th>
             <th style={{ border: '1px solid #ccc', padding: '8px' }}>Factorization</th>
             <th style={{ border: '1px solid #ccc', padding: '8px' }}>Quadratics</th>
+            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Applications</th>
           </tr>
         </thead>
         <tbody>
@@ -46,7 +48,7 @@ function Heatmap() {
                   color: 'white',
                 }}
               >
-                {(row.algebra * 100).toFixed(0)}%
+                {row.algebra === null ? '—' : `${(row.algebra * 100).toFixed(0)}%`}
               </td>
               <td
                 style={{
@@ -56,7 +58,7 @@ function Heatmap() {
                   color: 'white',
                 }}
               >
-                {(row.factorization * 100).toFixed(0)}%
+                {row.factorization === null ? '—' : `${(row.factorization * 100).toFixed(0)}%`}
               </td>
               <td
                 style={{
@@ -66,7 +68,17 @@ function Heatmap() {
                   color: 'white',
                 }}
               >
-                {(row.quadratics * 100).toFixed(0)}%
+                {row.quadratics === null ? '—' : `${(row.quadratics * 100).toFixed(0)}%`}
+              </td>
+              <td
+                style={{
+                  border: '1px solid #ccc',
+                  padding: '8px',
+                  background: getCellColor(row.applications),
+                  color: 'white',
+                }}
+              >
+                {row.applications === null ? '—' : `${(row.applications * 100).toFixed(0)}%`}
               </td>
             </tr>
           ))}
